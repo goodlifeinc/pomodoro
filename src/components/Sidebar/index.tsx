@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Pomodoro } from "../PomodoroReducer";
+import { Pomodoro } from "../../reducers/pomodoro";
 import { Box, Main, List, Text, Meter } from "grommet";
 
 interface SidebarPropTypes {
