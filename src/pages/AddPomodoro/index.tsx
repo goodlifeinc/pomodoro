@@ -1,21 +1,17 @@
-import React, { SyntheticEvent } from "react";
-import { Pomodoro } from "../PomodoroReducer";
+import React, { SyntheticEvent, useContext } from "react";
 import {
   Box,
   Form,
   FormField,
   Button
 } from "grommet";
+import { Pomodoro } from "../../reducers/pomodoro";
+import AppContext from "../../context/AppContext";
+import { navigate } from "../../utils";
 
-interface AddPomodoroPropTypes {
-  dispatch: React.Dispatch<{
-    type: any;
-    pomodoro: Pomodoro;
-  }>;  
-  onCancel: () => void;
-}
 
-const AddPomodoro: React.FC<AddPomodoroPropTypes> = ({ dispatch, onCancel }) => {
+const AddPomodoro: React.FC = () => {
+  const { dispatch } = useContext(AppContext);
   const onFormSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
     let target = e.target as HTMLFormElement;
@@ -29,7 +25,7 @@ const AddPomodoro: React.FC<AddPomodoroPropTypes> = ({ dispatch, onCancel }) => 
       secondsElapsed: 0
     };
     dispatch({ type: "add", pomodoro });
-    onCancel();
+    navigate('/');
   };
   return (
     <div>
@@ -48,7 +44,7 @@ const AddPomodoro: React.FC<AddPomodoroPropTypes> = ({ dispatch, onCancel }) => 
               required
             />
             <Box direction="row" justify="between" margin={{ top: "medium" }}>
-              <Button label="Cancel" onClick={(e) => {onCancel()}} />
+              <Button label="Cancel" onClick={(e) => {window.history.back()}} />
               <Button type="reset" label="Reset" />
               <Button type="submit" label="Create" primary />
             </Box>

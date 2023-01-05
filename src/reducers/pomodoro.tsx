@@ -45,7 +45,9 @@ function reducer(
     case "add":
       pomodoro = Object.assign({}, action.pomodoro);
       pomodoro.id = uuidv4();
-      return { ...state, pomodoros: [...state.pomodoros, pomodoro] };
+      const newState = { ...state, pomodoros: [...state.pomodoros, pomodoro] };
+      if (!newState.activePomodoro) newState.activePomodoro = pomodoro;
+      return newState;
     case "active":
       pomodoro = Object.assign({}, action.pomodoro);
       return { ...state, activePomodoro: pomodoro };

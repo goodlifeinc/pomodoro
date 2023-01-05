@@ -1,23 +1,12 @@
-import React, { useRef, useEffect } from "react";
-import { Pomodoro } from "../PomodoroReducer";
+import React, { useRef, useEffect, useContext, useState } from "react";
 import { Box, Main, Meter, Stack, Text, Heading, Button } from "grommet";
+import AppContext from "../../context/AppContext";
 
-interface PomodoroPropTypes {
-  pomodoro: Pomodoro;
-  dispatch: React.Dispatch<{
-    type: any;
-    pomodoro: Pomodoro;
-  }>;
-  setIsStarted: (arg: boolean) => void;
-  isStarted: boolean;
-}
+const PomodoroView: React.FC = () => {
+  const { state, dispatch } = useContext(AppContext);
 
-const PomodoroView: React.FC<PomodoroPropTypes> = ({
-  pomodoro,
-  dispatch,
-  setIsStarted,
-  isStarted
-}) => {
+  const [isStarted, setIsStarted] = useState(false);
+
   const savedCallback = useRef(() => {});
   const id = useRef(setInterval(() => {}, 0));
 
@@ -25,8 +14,8 @@ const PomodoroView: React.FC<PomodoroPropTypes> = ({
     dispatch({
       type: "update",
       pomodoro: {
-        ...pomodoro,
-        secondsElapsed: pomodoro.secondsElapsed + 1
+        ...state.activePomodoro,
+        secondsElapsed: state.activePomodoro.secondsElapsed + 1
       }
     });
   }
@@ -41,7 +30,7 @@ const PomodoroView: React.FC<PomodoroPropTypes> = ({
       setIsStarted(false);
       clearTimeout(id.current);
     }
-  }, [pomodoro.id])
+  }, [state.activePomodoro.id, setIsStarted])
 
   const toggleCountdown = () => {
     function tick() {
@@ -55,30 +44,32 @@ const PomodoroView: React.FC<PomodoroPropTypes> = ({
     }
   };
 
-  const periodInSeconds = pomodoro.timePerRound * 60;
-  const timeLeftSeconds = periodInSeconds - pomodoro.secondsElapsed;
-  const meterValue = (pomodoro.secondsElapsed / periodInSeconds) * 100;
-  if (timeLeftSeconds === 0) {
-    clearInterval(id.current);
-    dispatch({
-      type: "update",
-      pomodoro: {
-        ...pomodoro,
-        roundsExecuted: pomodoro.roundsExecuted + 1,
-        secondsElapsed: 0
-      }
-    });
-    setIsStarted(!isStarted);
-  }
+  const periodInSeconds = state.activePomodoro.timePerRound * 60;
+  const timeLeftSeconds = periodInSeconds - state.activePomodoro.secondsElapsed;
+  const meterValue = (state.activePomodoro.secondsElapsed / periodInSeconds) * 100;
+  useEffect(() => {
+    if (timeLeftSeconds === 0) {
+      clearInterval(id.current);
+      dispatch({
+        type: "update",
+        pomodoro: {
+          ...state.activePomodoro,
+          roundsExecuted: state.activePomodoro.roundsExecuted + 1,
+          secondsElapsed: 0
+        }
+      });
+      setIsStarted(!isStarted);
+    }
+  }, [timeLeftSeconds, dispatch, isStarted, state.activePomodoro]);
 
   return (
     <Box flex border={{ color: "brand", size: "large" }} pad="small">
       <Main pad="small" align="center">
-        <Heading level="3">{pomodoro.name}</Heading>
-        <Text>total rounds: {pomodoro.rounds}</Text>
-        <Text>rounds executed: {pomodoro.roundsExecuted}</Text>
-        <Text>time per round: {pomodoro.timePerRound}</Text>
-        <Text>rest between rounds: {pomodoro.restBetweenRounds}</Text>
+        <Heading level="3">{state.activePomodoro.name}</Heading>
+        <Text>total rounds: {state.activePomodoro.rounds}</Text>
+        <Text>rounds executed: {state.activePomodoro.roundsExecuted}</Text>
+        <Text>time per round: {state.activePomodoro.timePerRound}</Text>
+        <Text>rest between rounds: {state.activePomodoro.restBetweenRounds}</Text>
         <Box align="center" pad="small">
           <Stack anchor="center">
             <Meter
@@ -97,7 +88,7 @@ const PomodoroView: React.FC<PomodoroPropTypes> = ({
               </Text>
             </Box>
           </Stack>
-          <Box direction="row" justify="between" margin={{ top: "medium" }}>
+          <Box direction="row" justify="between" margin={{ top: "medium" }} style={{display: 'block'}}>
             <Button
               type="reset"
               label="Reset"
@@ -105,7 +96,7 @@ const PomodoroView: React.FC<PomodoroPropTypes> = ({
                 dispatch({
                   type: "update",
                   pomodoro: {
-                    ...pomodoro,
+                    ...state.activePomodoro,
                     secondsElapsed: 0
                   }
                 });
@@ -115,6 +106,7 @@ const PomodoroView: React.FC<PomodoroPropTypes> = ({
               type="submit"
               label={!isStarted ? "Start" : "Stop"}
               primary
+              disabled={(state.activePomodoro.rounds - state.activePomodoro.roundsExecuted) === 0}
               onClick={toggleCountdown}
             />
           </Box>
