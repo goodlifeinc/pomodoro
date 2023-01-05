@@ -47,18 +47,20 @@ const PomodoroView: React.FC = () => {
   const periodInSeconds = state.activePomodoro.timePerRound * 60;
   const timeLeftSeconds = periodInSeconds - state.activePomodoro.secondsElapsed;
   const meterValue = (state.activePomodoro.secondsElapsed / periodInSeconds) * 100;
-  if (timeLeftSeconds === 0) {
-    clearInterval(id.current);
-    dispatch({
-      type: "update",
-      pomodoro: {
-        ...state.activePomodoro,
-        roundsExecuted: state.activePomodoro.roundsExecuted + 1,
-        secondsElapsed: 0
-      }
-    });
-    setIsStarted(!isStarted);
-  }
+  useEffect(() => {
+    if (timeLeftSeconds === 0) {
+      clearInterval(id.current);
+      dispatch({
+        type: "update",
+        pomodoro: {
+          ...state.activePomodoro,
+          roundsExecuted: state.activePomodoro.roundsExecuted + 1,
+          secondsElapsed: 0
+        }
+      });
+      setIsStarted(!isStarted);
+    }
+  }, [timeLeftSeconds, dispatch, isStarted, state.activePomodoro]);
 
   return (
     <Box flex border={{ color: "brand", size: "large" }} pad="small">
@@ -104,6 +106,7 @@ const PomodoroView: React.FC = () => {
               type="submit"
               label={!isStarted ? "Start" : "Stop"}
               primary
+              disabled={(state.activePomodoro.rounds - state.activePomodoro.roundsExecuted) === 0}
               onClick={toggleCountdown}
             />
           </Box>
