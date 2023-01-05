@@ -13,7 +13,7 @@ const routes: any = {
 const Content: React.FC = () => {
   const pathname = usePathname();
   const view = useMemo(() => {
-    return routes[pathname] || <Main />
+    return routes[pathname] || <Main />;
   }, [pathname]);
   
   return (

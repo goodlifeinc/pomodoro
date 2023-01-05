@@ -11,9 +11,10 @@ const Main: React.FC = () => {
     const { state, dispatch } = useContext(AppContext);
     useEffect(() => {
         if (!state.pomodoros.length) {
-        navigate('/new');
+            setTimeout(() => navigate('/new'), 100);
         }
     }, [state.pomodoros.length]);
+    if (!state.pomodoros.length) return null;
     return (
         <Box
             flex

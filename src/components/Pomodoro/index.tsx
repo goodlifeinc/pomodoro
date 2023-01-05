@@ -86,7 +86,7 @@ const PomodoroView: React.FC = () => {
               </Text>
             </Box>
           </Stack>
-          <Box direction="row" justify="between" margin={{ top: "medium" }}>
+          <Box direction="row" justify="between" margin={{ top: "medium" }} style={{display: 'block'}}>
             <Button
               type="reset"
               label="Reset"

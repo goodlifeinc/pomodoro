@@ -7,7 +7,6 @@ export default (): string => {
 	  setPath(winPath);
 	};
 	React.useEffect(() => {
-		console.log('registering popstate');
 	  window.addEventListener("popstate", listenToPopstate);
 	  return () => {
 		window.removeEventListener("popstate", listenToPopstate);
